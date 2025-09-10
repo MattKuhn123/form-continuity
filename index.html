@@ -185,8 +185,14 @@
             const option = document.createElement('option');
             option.value = email;
             option.textContent = email;
+            if (email === getEmailField().value) {
+                option.selected = true;
+            }
+
             getFormStatesSelect().appendChild(option);
         });
+
+
     }
 
     function getFormStatesSelect() {
