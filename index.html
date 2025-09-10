@@ -72,7 +72,7 @@
             <label for="confirm-email">Confirm email</label>
             <input required type="email" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
             <output id="auto-save-enabled" style="display: none; color: green">Email confirmed: local auto-save enabled!</output>
-            <output id="auto-save-disabled" style="display: none; color: red">Email not confirmed: local auto-save disabled until emails match.</output>
+            <output id="auto-save-disabled" style="color: red">Email not confirmed: local auto-save disabled until emails match.</output>
         </fieldset>
     </details>
     <details>
@@ -126,6 +126,8 @@
         refreshFormStates();
 
         getFormSubmitOutput().innerHTML = result;
+        getForm().reset();
+        getForm().dispatchEvent(new Event('input'));
         return false; // Prevent actual form submission
     }
 
