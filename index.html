@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>form-continuity</title>
+    <style>
+        body {
+            font: 400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            color: #111;
+            background-color: #fdfdfd;
+            min-height: 100vh;
+            flex-direction: column;
+            max-width: -webkit-calc(800px - (30px * 2));
+            max-width: calc(800px - (30px * 2));
+            margin-right: auto;
+            margin-left: auto;
+            padding-right: 30px;
+            padding-left: 30px;
+        }
+
+        button, input, select, textarea {
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+
+        button {
+            background-color: darkseagreen;
+        }
+
+        input, select {
+            display: block;
+        }
+
+        output {
+            font-family: monospace;
+            font-style: italic;
+            font-size: small;
+        }
+
+        .full-width {
+            width: 100%;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<section id="form-states-section">
+    <label for="form-states">Contacts in progress...</label>
+    <select id="form-states" oninput="loadSelectedFormState()" class="full-width"></select>
+</section>
+<hr>
+<form onsubmit="return onFormSubmit()" oninput="onFormInput()">
+    <h1>Contact</h1>
+    <details open>
+        <summary>Contact Details</summary>
+        <fieldset id="contact-details">
+            <label for="email">Email</label>
+            <input required type="email" name="email" id="email" placeholder="johndoe@mail.com">
+            <label for="confirm-email">Confirm email</label>
+            <input required type="email" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
+        </fieldset>
+    </details>
+    <details>
+        <summary>Contact Name</summary>
+        <fieldset id="contact-name">
+            <label for="first-name">First Name</label>
+            <input type="text" name="first-name" id="first-name" placeholder="John">
+            <label for="last-name">Last Name</label>
+            <input type="text" name="last-name" id="last-name" placeholder="Doe">
+        </fieldset>
+    </details>
+    <details>
+        <summary>Contact Address</summary>
+        <fieldset id="contact-address">
+            <label for="address">Street address</label>
+            <input type="text" name="address" id="address" placeholder="123 Example St">
+            <label for="city">City</label>
+            <input type="text" name="city" id="city" placeholder="Sample City">
+            <label for="state">State/Province</label>
+            <input type="text" name="state" id="state" placeholder="KY">
+        </fieldset>
+    </details>
+    <button type="submit" class="full-width">Submit</button>
+</form>
+<output></output>
+<script>
+    const prefix = 'formState-';
+
+    function onFormInput() {
+        if (isEmailConfirmed()) {
+            saveFormState();
+        }
+
+        refreshFormStates();
+        getOutput().innerHTML = '';
+    }
+
+    function onFormSubmit() {
+        let result = '[submitted] <br>';
+        for (const [key, value] of new FormData(getForm()).entries()) {
+            result += `${key}: ${value}<br>`;
+        }
+
+        const emailFieldValue = getForm().elements.namedItem('email').value;
+        localStorage.removeItem(prefix + emailFieldValue);
+        refreshFormStates();
+
+        getOutput().innerHTML = result;
+        return false; // Prevent actual form submission
+    }
+
+    function isEmailConfirmed() {
+        return getEmailField()
+            && getEmailField().checkValidity()
+            && getEmailField().value === getConfirmEmailField().value;
+    }
+
+    function saveFormState() {
+        const emailField = getForm().elements.namedItem('email');
+        if (emailField && emailField.checkValidity()) {
+            const formData = new FormData(getForm());
+            const formObj = {};
+            for (const [key, value] of formData.entries()) {
+                formObj[key] = value;
+            }
+            localStorage.setItem(prefix + emailField.value, JSON.stringify(formObj));
+        }
+    }
+
+    function loadSelectedFormState() {
+        const emailFieldValue = getFormStatesSelect().value;
+        const formState = localStorage.getItem(prefix + emailFieldValue);
+        if (formState) {
+            const formObj = JSON.parse(formState);
+            for (const [key, value] of Object.entries(formObj)) {
+                const field = getForm().elements.namedItem(key);
+                if (field) {
+                    field.value = value;
+                }
+            }
+        } else {
+            getForm().reset();
+        }
+    }
+
+    function getFormStateKeys() {
+        const emails = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(prefix)) {
+                emails.push(key.substring(prefix.length));
+            }
+        }
+        return emails;
+    }
+
+    function refreshFormStates() {
+        getFormStatesSelect().innerHTML = '';
+        const emails = getFormStateKeys();
+        getFormStatesSelect().appendChild(document.createElement('option'));
+        emails.forEach(email => {
+            const option = document.createElement('option');
+            option.value = email;
+            option.textContent = email;
+            getFormStatesSelect().appendChild(option);
+        });
+    }
+
+    function getFormStatesSelect() {
+        return document.getElementById('form-states');
+    }
+
+    function getForm() {
+        return document.querySelector('form');
+    }
+
+    function getOutput() {
+        return document.querySelector('output');
+    }
+
+    function getEmailField() {
+        return getForm().elements.namedItem('email');
+    }
+
+    function getConfirmEmailField() {
+        return getForm().elements.namedItem('confirm-email');
+    }
+
+    refreshFormStates();
+</script>
+</body>
+
+</html>
