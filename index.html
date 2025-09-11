@@ -97,9 +97,16 @@
     </details>
     <button type="submit" class="full-width">Submit</button>
 </form>
-<output id="form-submit"></output>
+<dialog id="form-submit-result" onclose="onCloseFormSubmitResult()">
+
+</dialog>
 <script>
     const prefix = 'formState-';
+
+    function onCloseFormSubmitResult() {
+        getForm().reset();
+        getForm().dispatchEvent(new Event('input'));
+    }
 
     function onFormInput() {
         if (isEmailConfirmed()) {
@@ -112,7 +119,6 @@
         }
 
         refreshFormStates();
-        getFormSubmitOutput().innerHTML = '';
     }
 
     function onFormSubmit() {
@@ -121,13 +127,13 @@
             result += `${key}: ${value}<br>`;
         }
 
+        result += `<button onclick="this.parentElement.close()" class="full-width">Close</button>`;
+
         const emailFieldValue = getForm().elements.namedItem('email').value;
         localStorage.removeItem(prefix + emailFieldValue);
         refreshFormStates();
 
-        getFormSubmitOutput().innerHTML = result;
-        getForm().reset();
-        getForm().dispatchEvent(new Event('input'));
+        setFormSubmitOutput(result);
         return false; // Prevent actual form submission
     }
 
@@ -205,8 +211,10 @@
         return document.querySelector('form');
     }
 
-    function getFormSubmitOutput() {
-        return document.querySelector('output#form-submit');
+    function setFormSubmitOutput(html) {
+        const dialog = document.querySelector('dialog#form-submit-result');
+        dialog.innerHTML = html;
+        dialog.showModal();
     }
 
     function getEmailField() {
