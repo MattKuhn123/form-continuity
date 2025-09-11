@@ -62,15 +62,15 @@
     <label for="form-states">Contacts in progress...</label>
     <select id="form-states" oninput="loadSelectedFormState()" class="full-width"></select>
 </section>
-<form onsubmit="return onFormSubmit()">
+<form onsubmit="return onFormSubmit()" oninput="saveFormState();">
     <h1>Contact</h1>
     <details open>
         <summary>Contact Details</summary>
         <fieldset id="contact-details">
             <label for="email">Email</label>
-            <input required type="email" oninput="onEmailInput()" name="email" id="email" placeholder="johndoe@mail.com">
+            <input required type="email" oninput="onEmailInput()" name="email" id="email" placeholder="johndoe@mail.com" data-auto-save>
             <label for="confirm-email">Confirm email</label>
-            <input required type="email" oninput="onEmailInput()" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
+            <input required type="email" oninput="onEmailInput()" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com" data-auto-save>
             <output id="auto-save-enabled" style="display: none; color: green">Email confirmed: local auto-save enabled!</output>
             <output id="auto-save-disabled" style="color: red">Email not confirmed: local auto-save disabled until emails match.</output>
         </fieldset>
@@ -79,20 +79,27 @@
         <summary>Contact Name</summary>
         <fieldset id="contact-name">
             <label for="first-name">First Name</label>
-            <input type="text" name="first-name" id="first-name" placeholder="John">
+            <input type="text" name="first-name" id="first-name" placeholder="John" data-auto-save>
             <label for="last-name">Last Name</label>
-            <input type="text" name="last-name" id="last-name" placeholder="Doe">
+            <input type="text" name="last-name" id="last-name" placeholder="Doe" data-auto-save>
         </fieldset>
     </details>
     <details>
         <summary>Contact Address</summary>
         <fieldset id="contact-address">
             <label for="address">Street address</label>
-            <input type="text" name="address" id="address" placeholder="123 Example St">
+            <input type="text" name="address" id="address" placeholder="123 Example St" data-auto-save>
             <label for="city">City</label>
-            <input type="text" name="city" id="city" placeholder="Sample City">
+            <input type="text" name="city" id="city" placeholder="Sample City" data-auto-save>
             <label for="state">State/Province</label>
-            <input type="text" name="state" id="state" placeholder="KY">
+            <input type="text" name="state" id="state" placeholder="KY" data-auto-save>
+        </fieldset>
+    </details>
+    <details>
+        <summary>Identifying Information</summary>
+        <fieldset id="identifying-info">
+            <label for="ssn">SSN</label>
+            <input type="password" name="ssn" id="ssn">
         </fieldset>
     </details>
     <button type="submit" class="full-width">Submit</button>
@@ -115,7 +122,6 @@
 
     function toggleSaveEnabledDisabledNotification() {
         if (isEmailConfirmed()) {
-            saveFormState();
             document.querySelector("output#auto-save-enabled").style.display = 'block';
             document.querySelector("output#auto-save-disabled").style.display = 'none';
         } else {
@@ -125,7 +131,7 @@
     }
 
     function onFormSubmit() {
-        let result = `<header><h2>[submitted]</h2></header>`;
+        let result = `<header><h2>Submitted!</h2></header>`;
         for (const [key, value] of new FormData(getForm()).entries()) {
             result += `${key}: ${value}<br>`;
         }
@@ -147,12 +153,12 @@
     }
 
     function saveFormState() {
-        if (getEmailField() && getEmailField().checkValidity()) {
-            const formData = new FormData(getForm());
+        if (getEmailField().value === getConfirmEmailField().value && getEmailField().checkValidity()) {
+            const form = getForm();
             const formObj = {};
-            for (const [key, value] of formData.entries()) {
-                formObj[key] = value;
-            }
+            Array.from(form.elements).filter(el => el.hasAttribute('data-auto-save')).forEach(el => {
+                formObj[el.name] = el.value;
+            });
 
             localStorage.setItem(prefix + getEmailField().value, JSON.stringify(formObj));
         }
@@ -173,7 +179,7 @@
             getForm().reset();
         }
 
-        getForm().dispatchEvent(new Event('input'));
+        toggleSaveEnabledDisabledNotification();
     }
 
     function getFormStateKeys() {
@@ -201,8 +207,6 @@
 
             getFormStatesSelect().appendChild(option);
         });
-
-
     }
 
     function getFormStatesSelect() {
