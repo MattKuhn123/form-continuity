@@ -62,15 +62,15 @@
     <label for="form-states">Contacts in progress...</label>
     <select id="form-states" oninput="loadSelectedFormState()" class="full-width"></select>
 </section>
-<form onsubmit="return onFormSubmit()" oninput="onFormInput()">
+<form onsubmit="return onFormSubmit()">
     <h1>Contact</h1>
     <details open>
         <summary>Contact Details</summary>
         <fieldset id="contact-details">
             <label for="email">Email</label>
-            <input required type="email" name="email" id="email" placeholder="johndoe@mail.com">
+            <input required type="email" oninput="onEmailInput()" name="email" id="email" placeholder="johndoe@mail.com">
             <label for="confirm-email">Confirm email</label>
-            <input required type="email" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
+            <input required type="email" oninput="onEmailInput()" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
             <output id="auto-save-enabled" style="display: none; color: green">Email confirmed: local auto-save enabled!</output>
             <output id="auto-save-disabled" style="color: red">Email not confirmed: local auto-save disabled until emails match.</output>
         </fieldset>
@@ -108,7 +108,12 @@
         getForm().dispatchEvent(new Event('input'));
     }
 
-    function onFormInput() {
+    function onEmailInput() {
+        toggleSaveEnabledDisabledNotification();
+        refreshFormStates();
+    }
+
+    function toggleSaveEnabledDisabledNotification() {
         if (isEmailConfirmed()) {
             saveFormState();
             document.querySelector("output#auto-save-enabled").style.display = 'block';
@@ -117,20 +122,17 @@
             document.querySelector("output#auto-save-enabled").style.display = 'none';
             document.querySelector("output#auto-save-disabled").style.display = 'block';
         }
-
-        refreshFormStates();
     }
 
     function onFormSubmit() {
-        let result = '[submitted] <br>';
+        let result = `<header><h2>[submitted]</h2></header>`;
         for (const [key, value] of new FormData(getForm()).entries()) {
             result += `${key}: ${value}<br>`;
         }
 
-        result += `<button onclick="this.parentElement.close()" class="full-width">Close</button>`;
+        result += `<footer><button onclick="this.parentElement.parentElement.close()" class="full-width">Close</button></footer>`;
 
-        const emailFieldValue = getForm().elements.namedItem('email').value;
-        localStorage.removeItem(prefix + emailFieldValue);
+        localStorage.removeItem(prefix + getEmailField().value);
         refreshFormStates();
 
         setFormSubmitOutput(result);
@@ -145,14 +147,14 @@
     }
 
     function saveFormState() {
-        const emailField = getForm().elements.namedItem('email');
-        if (emailField && emailField.checkValidity()) {
+        if (getEmailField() && getEmailField().checkValidity()) {
             const formData = new FormData(getForm());
             const formObj = {};
             for (const [key, value] of formData.entries()) {
                 formObj[key] = value;
             }
-            localStorage.setItem(prefix + emailField.value, JSON.stringify(formObj));
+
+            localStorage.setItem(prefix + getEmailField().value, JSON.stringify(formObj));
         }
     }
 
