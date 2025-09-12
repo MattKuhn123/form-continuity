@@ -58,41 +58,41 @@
     confirmed, the form state will be saved automatically as you make changes. You can select a saved contact from the dropdown to load its state back into the form.
 </aside>
 <hr>
-<section id="form-states-section">
-    <label for="form-states">Contacts in progress...</label>
-    <select id="form-states" oninput="loadSelectedFormState()" class="full-width"></select>
+<section id="form-saves-section">
+    <label for="form-saves">Contacts in progress...</label>
+    <select data-form-saves id="form-saves" oninput="loadSelectedFormSave()" class="full-width"></select>
 </section>
-<form onsubmit="return onFormSubmit()" oninput="saveFormState();">
+<form onsubmit="return onFormSubmit()" oninput="saveFormSave()">
     <h1>Contact</h1>
     <details open>
         <summary>Contact Details</summary>
         <fieldset id="contact-details">
             <label for="email">Email</label>
-            <input required type="email" oninput="onEmailInput()" name="email" id="email" placeholder="johndoe@mail.com" data-auto-save>
+            <input data-auto-save type="email" oninput="onEmailInput()" name="email" id="email" placeholder="johndoe@mail.com">
             <label for="confirm-email">Confirm email</label>
-            <input required type="email" oninput="onEmailInput()" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com" data-auto-save>
-            <output id="auto-save-enabled" style="display: none; color: green">Email confirmed: local auto-save enabled!</output>
-            <output id="auto-save-disabled" style="color: red">Email not confirmed: local auto-save disabled until emails match.</output>
+            <input data-auto-save type="email" oninput="onEmailInput()" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
+            <output data-save-enabled-notice style="display: none; color: green">Email confirmed: local auto-save enabled!</output>
+            <output data-save-disabled-notice style="color: red">Email not confirmed: local auto-save disabled until emails match.</output>
         </fieldset>
     </details>
     <details>
         <summary>Contact Name</summary>
         <fieldset id="contact-name">
             <label for="first-name">First Name</label>
-            <input type="text" name="first-name" id="first-name" placeholder="John" data-auto-save>
+            <input data-auto-save type="text" name="first-name" id="first-name" placeholder="John">
             <label for="last-name">Last Name</label>
-            <input type="text" name="last-name" id="last-name" placeholder="Doe" data-auto-save>
+            <input data-auto-save type="text" name="last-name" id="last-name" placeholder="Doe">
         </fieldset>
     </details>
     <details>
         <summary>Contact Address</summary>
         <fieldset id="contact-address">
             <label for="address">Street address</label>
-            <input type="text" name="address" id="address" placeholder="123 Example St" data-auto-save>
+            <input data-auto-save type="text" name="address" id="address" placeholder="123 Example St">
             <label for="city">City</label>
-            <input type="text" name="city" id="city" placeholder="Sample City" data-auto-save>
+            <input data-auto-save type="text" name="city" id="city" placeholder="Sample City">
             <label for="state">State/Province</label>
-            <input type="text" name="state" id="state" placeholder="KY" data-auto-save>
+            <input data-auto-save type="text" name="state" id="state" placeholder="KY">
         </fieldset>
     </details>
     <details>
@@ -108,43 +108,57 @@
 
 </dialog>
 <script>
-    const prefix = 'formState-';
+    const prefix = 'form-save-';
+    let isAutoSaveEnabled = isEmailConfirmed;
 
     function onCloseFormSubmitResult() {
         getForm().reset();
-        getForm().dispatchEvent(new Event('input'));
+        toggleSaveStatusNotification();
+        refreshFormSavesSelect();
     }
 
     function onEmailInput() {
-        toggleSaveEnabledDisabledNotification();
-        refreshFormStates();
-    }
-
-    function toggleSaveEnabledDisabledNotification() {
-        if (isEmailConfirmed()) {
-            document.querySelector("output#auto-save-enabled").style.display = 'block';
-            document.querySelector("output#auto-save-disabled").style.display = 'none';
-        } else {
-            document.querySelector("output#auto-save-enabled").style.display = 'none';
-            document.querySelector("output#auto-save-disabled").style.display = 'block';
-        }
+        toggleSaveStatusNotification();
+        refreshFormSavesSelect();
     }
 
     function onFormSubmit() {
-        let result = `<header><h2>Submitted!</h2></header>`;
-        for (const [key, value] of new FormData(getForm()).entries()) {
-            result += `${key}: ${value}<br>`;
-        }
-
-        result += `<footer><button onclick="this.parentElement.parentElement.close()" class="full-width">Close</button></footer>`;
-
+        showFormSubmitResultsDialog();
         localStorage.removeItem(prefix + getEmailField().value);
-        refreshFormStates();
-
-        setFormSubmitOutput(result);
+        getForm().reset();
+        toggleSaveStatusNotification();
+        refreshFormSavesSelect();
         return false; // Prevent actual form submission
     }
 
+    function toggleSaveStatusNotification() {
+        if (isAutoSaveEnabled()) {
+            document.querySelector("[data-save-enabled-notice]").style.display = 'block';
+            document.querySelector("[data-save-disabled-notice]").style.display = 'none';
+        } else {
+            document.querySelector("[data-save-enabled-notice]").style.display = 'none';
+            document.querySelector("[data-save-disabled-notice]").style.display = 'block';
+        }
+    }
+
+    function showFormSubmitResultsDialog() {
+        getFormSubmitResultDialog().innerHTML = `<header><h2>Submitted!</h2></header>`;
+        for (const [key, value] of new FormData(getForm()).entries()) {
+            getFormSubmitResultDialog().innerHTML += `${key}: ${value}<br>`;
+        }
+
+        getFormSubmitResultDialog().innerHTML += `<footer><button onclick="this.parentElement.parentElement.close()" class="full-width">Close</button></footer>`;
+        getFormSubmitResultDialog().showModal();
+    }
+
+    function getEmailField() {
+        return getForm().elements.namedItem('email');
+    }
+
+    function getConfirmEmailField() {
+        return getForm().elements.namedItem('confirm-email');
+    }
+    
     function isEmailConfirmed() {
         return getEmailField()
             && getEmailField().checkValidity()
@@ -152,23 +166,22 @@
             && getEmailField().value === getConfirmEmailField().value;
     }
 
-    function saveFormState() {
-        if (getEmailField().value === getConfirmEmailField().value && getEmailField().checkValidity()) {
-            const form = getForm();
+    function saveFormSave() {
+        if (isAutoSaveEnabled()) {
             const formObj = {};
-            Array.from(form.elements).filter(el => el.hasAttribute('data-auto-save')).forEach(el => {
-                formObj[el.name] = el.value;
-            });
+            Array.from(getForm().elements).filter(x => x.hasAttribute('data-auto-save')).forEach(x =>
+                formObj[x.name] = x.value
+            );
 
             localStorage.setItem(prefix + getEmailField().value, JSON.stringify(formObj));
+            refreshFormSavesSelect();
         }
     }
 
-    function loadSelectedFormState() {
-        const emailFieldValue = getFormStatesSelect().value;
-        const formState = localStorage.getItem(prefix + emailFieldValue);
-        if (formState) {
-            const formObj = JSON.parse(formState);
+    function loadSelectedFormSave() {
+        const formSave = localStorage.getItem(prefix + getFormSavesSelect().value);
+        if (formSave) {
+            const formObj = JSON.parse(formSave);
             for (const [key, value] of Object.entries(formObj)) {
                 const field = getForm().elements.namedItem(key);
                 if (field) {
@@ -179,10 +192,10 @@
             getForm().reset();
         }
 
-        toggleSaveEnabledDisabledNotification();
+        toggleSaveStatusNotification();
     }
 
-    function getFormStateKeys() {
+    function getFormSaveKeys() {
         const emails = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -193,45 +206,26 @@
         return emails;
     }
 
-    function refreshFormStates() {
-        getFormStatesSelect().innerHTML = '';
-        const emails = getFormStateKeys();
-        getFormStatesSelect().appendChild(document.createElement('option'));
-        emails.forEach(email => {
-            const option = document.createElement('option');
-            option.value = email;
-            option.textContent = email;
-            if (email === getEmailField().value) {
-                option.selected = true;
-            }
-
-            getFormStatesSelect().appendChild(option);
-        });
+    function refreshFormSavesSelect() {
+        getFormSavesSelect().innerHTML = `<option>-- Select a contact --</option>`;
+        getFormSaveKeys().forEach(x =>
+            getFormSavesSelect().innerHTML += `<option value="${x}" ${x === getEmailField().value ? "selected" : ""}>${x}</option>`
+        );
     }
 
-    function getFormStatesSelect() {
-        return document.getElementById('form-states');
+    function getFormSavesSelect() {
+        return document.querySelector(`select[data-form-saves]`);
     }
 
     function getForm() {
-        return document.querySelector('form');
+        return document.querySelector(`form`);
     }
 
-    function setFormSubmitOutput(html) {
-        const dialog = document.querySelector('dialog#form-submit-result');
-        dialog.innerHTML = html;
-        dialog.showModal();
+    function getFormSubmitResultDialog() {
+        return document.getElementById('form-submit-result');
     }
 
-    function getEmailField() {
-        return getForm().elements.namedItem('email');
-    }
-
-    function getConfirmEmailField() {
-        return getForm().elements.namedItem('confirm-email');
-    }
-
-    refreshFormStates();
+    refreshFormSavesSelect();
 </script>
 </body>
 
