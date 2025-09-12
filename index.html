@@ -106,15 +106,8 @@
 </form>
 <dialog id="form-submit-result"></dialog>
 
-<script type="module" src="form-auto-save.js"></script>
+<script src="form-auto-save.js"></script>
 <script>
-    window.isSaveEnabled = isEmailConfirmed;
-    window.autoSaveKey = getEmailFieldValue;
-
-    document.getElementById("email").addEventListener('input', function () {
-        document.dispatchEvent(new CustomEvent(refreshEventKey));
-    })
-
     function onFormSubmit() {
         showFormSubmitResultsDialog();
         return false; // Prevent actual form submission
@@ -152,6 +145,12 @@
             && getEmailField().value !== ''
             && getEmailField().value === getConfirmEmailField().value;
     }
+
+    window.isSaveEnabled = isEmailConfirmed;
+    window.autoSaveKey = getEmailFieldValue;
+    document.getElementById("email").addEventListener('input', function () {
+        document.dispatchEvent(new CustomEvent(window.refreshEventKey));
+    });
 </script>
 </body>
 
