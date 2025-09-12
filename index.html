@@ -41,7 +41,6 @@
 
         .full-width {
             width: 100%;
-            margin: 10px;
         }
 
         aside {
@@ -71,7 +70,7 @@
             <input data-auto-save type="email" name="email" id="email" placeholder="johndoe@mail.com">
             <label for="confirm-email">Confirm email</label>
             <input data-auto-save type="email" name="confirm-email" id="confirm-email" placeholder="johndoe@mail.com">
-            <output data-save-enabled-notice style="display: none; color: green">Email confirmed: local auto-save enabled!</output>
+            <output data-save-enabled-notice style="color: green">Email confirmed: local auto-save enabled!</output>
             <output data-save-disabled-notice style="color: red">Email not confirmed: local auto-save disabled until emails match.</output>
         </fieldset>
     </details>
@@ -106,112 +105,8 @@
 </form>
 <dialog id="form-submit-result"></dialog>
 
+<script src="form-auto-save.js"></script>
 <script>
-    // -- Auto-save logic --
-    const refreshEventKey = 'form-auto-save-refresh';
-    var isSaveEnabled = () => true;
-    var autoSaveKey = () => Math.floor(Math.random() * 10000);
-
-    const prefix = 'form-save-';
-    function saveForm() {
-        if (isSaveEnabled()) {
-            const formObj = {};
-            Array.from(getForm().elements).filter(x => x.hasAttribute('data-auto-save')).forEach(x =>
-                formObj[x.name] = x.value
-            );
-
-            localStorage.setItem(prefix + autoSaveKey(), JSON.stringify(formObj));
-            refresh();
-        }
-    }
-
-    function loadForm() {
-        getForm().reset();
-        const formSave = localStorage.getItem(prefix + getFormSelect().value);
-        if (formSave) {
-            const formObj = JSON.parse(formSave);
-            for (const [key, value] of Object.entries(formObj)) {
-                const field = getForm().elements.namedItem(key);
-                if (field) {
-                    field.value = value;
-                }
-            }
-        }
-
-        refresh();
-    }
-
-    function deleteForm() {
-        localStorage.removeItem(prefix + autoSaveKey());
-        getForm().reset();
-        refresh();
-    }
-
-    function getFormSaveKeys() {
-        const keys = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith(prefix)) {
-                keys.push(key.substring(prefix.length));
-            }
-        }
-
-        return keys;
-    }
-
-    function refreshSaveStatusNotification() {
-        if (isSaveEnabled()) {
-            getSaveEnabledNotice().style.display = 'block';
-            getSaveDisabledNotice().style.display = 'none';
-        } else {
-            getSaveEnabledNotice().style.display = 'none';
-            getSaveDisabledNotice().style.display = 'block';
-        }
-    }
-
-    function refreshFormSelect() {
-        getFormSelect().innerHTML = `<option>-- Select an option --</option>`;
-        getFormSaveKeys().forEach(x =>
-            getFormSelect().innerHTML += `<option value="${x}" ${x === autoSaveKey() ? "selected" : ""}>${x}</option>`
-        );
-    }
-
-    function refresh() {
-        refreshSaveStatusNotification();
-        refreshFormSelect();
-    }
-
-    function getSaveEnabledNotice() {
-        return document.querySelector(`[data-save-enabled-notice]`);
-    }
-
-    function getSaveDisabledNotice() {
-        return document.querySelector(`[data-save-disabled-notice]`);
-    }
-
-    function getFormSelect() {
-        return document.querySelector(`select[data-form-saves]`);
-    }
-
-    function getForm() {
-        return document.querySelector(`form[data-auto-save-form]`);
-    }
-
-    document.querySelector(`form[data-auto-save-form]`).addEventListener('input', saveForm);
-    document.querySelector(`form[data-auto-save-form]`).addEventListener('submit', deleteForm);
-    document.querySelector(`select[data-form-saves]`).addEventListener('input', loadForm);
-    document.addEventListener(refreshEventKey, refresh);
-    refreshFormSelect();
-</script>
-
-<script>
-    isSaveEnabled = isEmailConfirmed;
-    autoSaveKey = getEmailFieldValue;
-
-    document.getElementById("email").addEventListener('input', function () {
-        document.dispatchEvent(new CustomEvent(refreshEventKey));
-    })
-
     function onFormSubmit() {
         showFormSubmitResultsDialog();
         return false; // Prevent actual form submission
@@ -249,6 +144,12 @@
             && getEmailField().value !== ''
             && getEmailField().value === getConfirmEmailField().value;
     }
+
+    window.isSaveEnabled = isEmailConfirmed;
+    window.autoSaveKey = getEmailFieldValue;
+    document.getElementById("email").addEventListener('input', function () {
+        document.dispatchEvent(new CustomEvent(window.refreshEventKey));
+    });
 </script>
 </body>
 
