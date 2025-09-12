@@ -1,8 +1,8 @@
 // form-auto-save.js
 
-export const refreshEventKey = 'form-auto-save-refresh';
-export var isSaveEnabled = () => true;
-export var autoSaveKey = () => Math.floor(Math.random() * 10000);
+window.refreshEventKey = 'form-auto-save-refresh';
+window.isSaveEnabled = () => true;
+window.autoSaveKey = () => Math.floor(Math.random() * 10000);
 
 const prefix = 'form-save-';
 function saveForm() {
