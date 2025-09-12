@@ -43,7 +43,7 @@ function getFormSaveKeys() {
     const keys = [];
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith(prefix)) {
+        if (key?.startsWith(prefix)) {
             keys.push(key.substring(prefix.length));
         }
     }
@@ -93,4 +93,4 @@ document.querySelector(`form[data-auto-save-form]`).addEventListener('input', sa
 document.querySelector(`form[data-auto-save-form]`).addEventListener('submit', deleteForm);
 document.querySelector(`select[data-form-saves]`).addEventListener('input', loadForm);
 document.addEventListener(refreshEventKey, refresh);
-refreshFormSelect();
+refresh();
