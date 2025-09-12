@@ -108,8 +108,8 @@
 
 <script type="module" src="form-auto-save.js"></script>
 <script>
-    isSaveEnabled = isEmailConfirmed;
-    autoSaveKey = getEmailFieldValue;
+    window.isSaveEnabled = isEmailConfirmed;
+    window.autoSaveKey = getEmailFieldValue;
 
     document.getElementById("email").addEventListener('input', function () {
         document.dispatchEvent(new CustomEvent(refreshEventKey));
