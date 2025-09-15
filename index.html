@@ -179,7 +179,7 @@ document.addEventListener('test', () => {
         return isVisible(q) === false;
     }
 
-    [
+    const tests = [
         {
             name: "It should show the save-disabled notice if the emails are different",
             fn: () => {
@@ -196,8 +196,23 @@ document.addEventListener('test', () => {
                 console.assert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
                 console.assert(isNotVisible('[data-save-disabled-notice]'), 'Save disabled notice should not be visible');
             }
-        },
-    ].forEach(test => {
+        }, {
+            name: "It should populate the form-saves select with saved forms",
+            fn: () => {
+                localStorage.setItem('form-save-mlkkuhn@live.com', JSON.stringify({ "email":"mlkkuhn@live.com", "confirm-email":"mlkkuhn@live.com" }));
+                localStorage.setItem('form-save-test@mail.com', JSON.stringify({ "email":"test@mail.com", "confirm-email":"test@mail.com" }));
+
+                document.dispatchEvent(new CustomEvent(window.refreshEventKey));
+
+                const options = document.querySelectorAll('[data-form-saves] option');
+                console.assert(options.length === 2, 'There should be 2 options in the form-saves select');
+                console.assert(options[0].value === 'mlkkuhn@live.com', 'The first option value should be mlkkuhn@live.com');
+                console.assert(options[1].value === 'test@mail.com', 'The second option value should be test@mail.com');
+            }
+        }
+    ];
+    
+    tests.forEach(test => {
         beforeEach(test.name);
         test.fn();
         afterEach(test.name);
