@@ -174,26 +174,24 @@ document.addEventListener('test', () => {
         getConfirmEmailField().dispatchEvent(newInputEvent());
     }
 
+    function isVisible(q) {
+        return document.querySelector(q).offsetParent !== null;
+    }
+
     [
         {
             name: "test_differentEmails_showsAutoSaveDisabledNotification", 
             fn: () => {
                 setEmailField('test@mail.com');
                 setConfirmEmailField('x-test@mail.com-x');
-                console.assert(
-                    document.querySelector('[data-save-disabled-notice]').offsetParent !== null,
-                    'Save disabled notice should be visible'
-                );
+                console.assert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
             }
         }, {
             name: "test_sameEmails_showsAutoSaveEnabledNotification", 
             fn: () => {
                 setEmailField('test@mail.com');
                 setConfirmEmailField('test@mail.com');
-                console.assert(
-                    document.querySelector('[data-save-enabled-notice]').offsetParent !== null,
-                    'Save enabled notice should be visible'
-                );
+                console.assert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
             }
         },
     ].forEach(test => {
