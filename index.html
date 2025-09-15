@@ -98,6 +98,8 @@
     <button type="submit" class="full-width">Submit</button>
 </form>
 <dialog id="form-submit-result"></dialog>
+<hr>
+<button onclick="document.dispatchEvent(new CustomEvent('test'))" class="full-width">Run Tests</button>
 
 <script src="form-auto-save.js"></script>
 <script>
@@ -164,14 +166,9 @@ document.addEventListener('test', () => {
         return new Event('input', { bubbles: true });
     }
 
-    function setEmailField(value) {
-        getEmailField().value = value;
-        getEmailField().dispatchEvent(newInputEvent());
-    }
-
-    function setConfirmEmailField(value) {
-        getConfirmEmailField().value = value;
-        getConfirmEmailField().dispatchEvent(newInputEvent());
+    function setField(q, value) {
+        document.querySelector(q).value = value;
+        document.querySelector(q).dispatchEvent(newInputEvent());
     }
 
     function isVisible(q) {
@@ -186,16 +183,16 @@ document.addEventListener('test', () => {
         {
             name: "It should show the save-disabled notice if the emails are different",
             fn: () => {
-                setEmailField('test@mail.com');
-                setConfirmEmailField('x-test@mail.com-x');
+                setField(`#email`, 'test@mail.com');
+                setField(`#confirm-email`, 'x-test@mail.com-x');
                 console.assert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
                 console.assert(isNotVisible('[data-save-enabled-notice]'), 'Save enabled notice should not be visible');
             }
         }, {
             name: "It should show the save-enabled notice if the emails are the same",
             fn: () => {
-                setEmailField('test@mail.com');
-                setConfirmEmailField('test@mail.com');
+                setField(`#email`, 'test@mail.com');
+                setField(`#confirm-email`, 'test@mail.com');
                 console.assert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
                 console.assert(isNotVisible('[data-save-disabled-notice]'), 'Save disabled notice should not be visible');
             }
