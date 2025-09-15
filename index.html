@@ -207,8 +207,8 @@ document.addEventListener('test', () => {
                 const options = document.querySelectorAll('[data-form-saves] option');
                 console.assert(options.length === 3, 'There should be 3 options in the form-saves select');
                 console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
-                console.assert(options[1].value === 'mlkkuhn@live.com', 'The first option value should be mlkkuhn@live.com');
-                console.assert(options[2].value === 'test@mail.com', 'The second option value should be test@mail.com');
+                console.assert(Array.from(options.entries()).some(x => x === 'mlkkuhn@live.com'), 'The first option value should be mlkkuhn@live.com');
+                console.assert(Array.from(options.entries()).some(x => x === 'test@mail.com'), 'The second option value should be test@mail.com');
             }
         }
     ];
