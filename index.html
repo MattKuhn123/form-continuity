@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>form-continuity</title>
+    <title>form-continuity-demo</title>
     <style>
         body {
             font: 400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
@@ -51,12 +51,6 @@
 </head>
 
 <body>
-<aside>
-    This is a demo of a simple contact form that saves its state in local storage as you fill it out. The email
-    field is used as a unique identifier for each contact. You can confirm the email by entering it twice. Once
-    confirmed, the form state will be saved automatically as you make changes. You can select a saved contact from the dropdown to load its state back into the form.
-</aside>
-<hr>
 <section id="form-saves-section">
     <label for="form-saves">Contacts in progress...</label>
     <select data-form-saves id="form-saves" class="full-width"></select>
@@ -150,6 +144,38 @@
     document.getElementById("email").addEventListener('input', function () {
         document.dispatchEvent(new CustomEvent(window.refreshEventKey));
     });
+</script>
+
+<script>
+document.addEventListener('test', () => {
+    console.log('Tests starting');
+    
+    function beforeEach(test) {
+        console.info('Test starting: ' + test);
+        document.querySelector('form').reset();
+        localStorage.clear();
+    }
+
+    function afterEach(test) {
+        console.info('Test completed: ' + test);
+    }
+
+    function test_differentEmails_showsAutoSaveDisabledNotification() {
+        document.getElementById('email').value = 'test@mail.com';
+        document.getElementById('confirm-email').value = 'x-test@mail.com-x';
+        
+        document.getElementById('email').dispatchEvent(new Event('input', { bubbles: true }));
+        console.assert(document.querySelector('[data-save-disabled-notice]').offsetParent !== null, 'Save disabled notice should be visible');
+    }
+
+    [
+        test_differentEmails_showsAutoSaveDisabledNotification,
+    ].forEach(test => {
+        beforeEach(test);
+        test();
+        afterEach(test);
+    });
+});
 </script>
 </body>
 

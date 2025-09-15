@@ -1,5 +1,3 @@
-// form-auto-save.js
-
 window.refreshEventKey = 'form-auto-save-refresh';
 window.isSaveEnabled = () => true;
 window.autoSaveKey = () => Math.floor(Math.random() * 10000);
@@ -89,8 +87,8 @@ function getForm() {
     return document.querySelector(`form[data-auto-save-form]`);
 }
 
-document.querySelector(`form[data-auto-save-form]`).addEventListener('input', saveForm);
-document.querySelector(`form[data-auto-save-form]`).addEventListener('submit', deleteForm);
-document.querySelector(`select[data-form-saves]`).addEventListener('input', loadForm);
+getForm().addEventListener('input', saveForm);
+getForm().addEventListener('submit', deleteForm);
+getFormSelect().addEventListener('input', loadForm);
 document.addEventListener(refreshEventKey, refresh);
 refresh();
