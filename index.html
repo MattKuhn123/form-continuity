@@ -178,20 +178,26 @@ document.addEventListener('test', () => {
         return document.querySelector(q).offsetParent !== null;
     }
 
+    function isNotVisible(q) {
+        return isVisible(q) === false;
+    }
+
     [
         {
-            name: "It should show the save-disabled notice if the emails are different", 
+            name: "It should show the save-disabled notice if the emails are different",
             fn: () => {
                 setEmailField('test@mail.com');
                 setConfirmEmailField('x-test@mail.com-x');
                 console.assert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
+                console.assert(isNotVisible('[data-save-enabled-notice]'), 'Save enabled notice should not be visible');
             }
         }, {
-            name: "It should show the save-enabled notice if the emails are the same", 
+            name: "It should show the save-enabled notice if the emails are the same",
             fn: () => {
                 setEmailField('test@mail.com');
                 setConfirmEmailField('test@mail.com');
                 console.assert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
+                console.assert(isNotVisible('[data-save-disabled-notice]'), 'Save disabled notice should not be visible');
             }
         },
     ].forEach(test => {
