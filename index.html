@@ -160,31 +160,27 @@ document.addEventListener('test', () => {
         console.info('Test completed: ' + test);
     }
 
-    const test_differentEmails_showsAutoSaveDisabledNotification = {
-        name: "test_differentEmails_showsAutoSaveDisabledNotification", 
-        fn: () => {
-            document.getElementById('email').value = 'test@mail.com';
-            document.getElementById('confirm-email').value = 'x-test@mail.com-x';
-            
-            document.getElementById('email').dispatchEvent(new Event('input', { bubbles: true }));
-            console.assert(document.querySelector('[data-save-disabled-notice]').offsetParent !== null, 'Save disabled notice should be visible');
-        }
-    };
-
-        const test_differentEmails_showsAutoSaveEnabledNotification = {
-        name: "test_differentEmails_showsAutoSaveEnabledNotification", 
-        fn: () => {
-            document.getElementById('email').value = 'test@mail.com';
-            document.getElementById('confirm-email').value = 'test@mail.com';
-            
-            document.getElementById('email').dispatchEvent(new Event('input', { bubbles: true }));
-            console.assert(document.querySelector('[data-save-enabled-notice]').offsetParent !== null, 'Save enabled notice should be visible');
-        }
-    };
-
     [
-        test_differentEmails_showsAutoSaveDisabledNotification,
-        test_differentEmails_showsAutoSaveEnabledNotification,
+        {
+            name: "test_differentEmails_showsAutoSaveDisabledNotification", 
+            fn: () => {
+                document.getElementById('email').value = 'test@mail.com';
+                document.getElementById('confirm-email').value = 'x-test@mail.com-x';
+                
+                document.getElementById('email').dispatchEvent(new Event('input', { bubbles: true }));
+                console.assert(document.querySelector('[data-save-disabled-notice]').offsetParent !== null, 'Save disabled notice should be visible');
+            }
+        },
+        {
+            name: "test_differentEmails_showsAutoSaveEnabledNotification", 
+            fn: () => {
+                document.getElementById('email').value = 'test@mail.com';
+                document.getElementById('confirm-email').value = 'test@mail.com';
+                
+                document.getElementById('email').dispatchEvent(new Event('input', { bubbles: true }));
+                console.assert(document.querySelector('[data-save-enabled-notice]').offsetParent !== null, 'Save enabled notice should be visible');
+            }
+        },
     ].forEach(test => {
         beforeEach(test.name);
         test.fn();
