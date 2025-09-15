@@ -171,6 +171,10 @@ document.addEventListener('test', () => {
         document.querySelector(q).dispatchEvent(newInputEvent());
     }
 
+    function getValue(q) {
+        return document.querySelector(q).value;
+    }
+
     function isVisible(q) {
         return document.querySelector(q).offsetParent !== null;
     }
@@ -209,6 +213,31 @@ document.addEventListener('test', () => {
                 console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
                 console.assert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'mlkkuhn@live.com'), 'The first option value should be mlkkuhn@live.com');
                 console.assert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'test@mail.com'), 'The second option value should be test@mail.com');
+            }
+        }, {
+            name: "It should reset and load a saved form when selected from the form-saves select",
+            fn: () => {
+                setField(`#last-name`, 'Kuhn');
+                localStorage.setItem('test@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
+                document.dispatchEvent(new CustomEvent(window.refreshEventKey));
+                document.querySelector('[data-form-saves]').selectedIndex = 1;
+                document.querySelector('[data-form-saves]').dispatchEvent(new Event('change', { bubbles: true }));
+                console.assert(getValue(`#email`) === 'x@mail.com', 'Email field should be populated with "x@mail.com"');
+                console.assert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
+                console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
+                console.assert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
+            }
+        }, {
+            name: "It should not save any fields that aren't marked with data-auto-save",
+            fn: () => {
+                setField(`#email`, 'test@mail.com');
+                setField(`#confirm-email`, 'test@mail.com');
+                setField(`#first-name`, 'Matt');
+                setField(`#ssn`, '123-45-6789');
+
+                const save = JSON.parse(localStorage.getItem('form-save-test@mail.com'));
+                console.assert(save["first-name"] === "Matt", 'first-name should be saved in localStorage because it is marked with data-auto-save');
+                console.assert(save["ssn"] === undefined, 'SSN should not be saved in localStorage because it is not marked with data-auto-save');
             }
         }
     ];
