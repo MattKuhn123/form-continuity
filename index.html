@@ -221,7 +221,7 @@ document.addEventListener('test', () => {
                 localStorage.setItem('test@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
                 document.dispatchEvent(new CustomEvent(window.refreshEventKey));
                 document.querySelector('[data-form-saves]').selectedIndex = 1;
-                document.querySelector('[data-form-saves]').dispatchEvent(new Event('change', { bubbles: true }));
+                document.querySelector('[data-form-saves]').dispatchEvent(new Event('input', { bubbles: true }));
                 console.assert(getValue(`#email`) === 'x@mail.com', 'Email field should be populated with "x@mail.com"');
                 console.assert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
                 console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
