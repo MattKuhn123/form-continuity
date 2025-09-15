@@ -180,14 +180,14 @@ document.addEventListener('test', () => {
 
     [
         {
-            name: "test_differentEmails_showsAutoSaveDisabledNotification", 
+            name: "It should show the save-disabled notice if the emails are different", 
             fn: () => {
                 setEmailField('test@mail.com');
                 setConfirmEmailField('x-test@mail.com-x');
                 console.assert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
             }
         }, {
-            name: "test_sameEmails_showsAutoSaveEnabledNotification", 
+            name: "It should show the save-enabled notice if the emails are the same", 
             fn: () => {
                 setEmailField('test@mail.com');
                 setConfirmEmailField('test@mail.com');
