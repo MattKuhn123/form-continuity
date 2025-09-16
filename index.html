@@ -233,7 +233,7 @@ document.addEventListener('test', () => {
                     setField(`#last-name`, 'Kuhn');
                     localStorage.setItem('test@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
                     document.dispatchEvent(new CustomEvent(window.refreshEventKey));
-                    document.querySelector(`[data-form-saves]`).selectedIndex = 1;
+                    document.querySelector(`[data-form-saves]`).value = 'x@mail.com';
                     document.querySelector(`[data-form-saves]`).dispatchEvent(new Event('input', { bubbles: true }));
                     setTimeout(() => {
                         console.assert(eventTriggered, 'formLoaded event should have been triggered');
