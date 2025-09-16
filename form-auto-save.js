@@ -29,6 +29,7 @@ function loadForm() {
     }
 
     refresh();
+    document.dispatchEvent(new CustomEvent(window.formLoadedKey));
 }
 
 function deleteForm() {
