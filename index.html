@@ -192,7 +192,8 @@ document.addEventListener('test', () => {
                 console.assert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
                 console.assert(isNotVisible('[data-save-enabled-notice]'), 'Save enabled notice should not be visible');
             }
-        }, {
+        },
+        {
             name: "It should show the save-enabled notice if the emails are the same",
             fn: () => {
                 setField(`#email`, 'test@mail.com');
@@ -200,7 +201,8 @@ document.addEventListener('test', () => {
                 console.assert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
                 console.assert(isNotVisible('[data-save-disabled-notice]'), 'Save disabled notice should not be visible');
             }
-        }, {
+        },
+        {
             name: "It should populate the form-saves select with saved forms",
             fn: () => {
                 localStorage.setItem('form-save-mlkkuhn@live.com', JSON.stringify({ "email":"mlkkuhn@live.com", "confirm-email":"mlkkuhn@live.com" }));
@@ -208,26 +210,36 @@ document.addEventListener('test', () => {
 
                 document.dispatchEvent(new CustomEvent(window.refreshEventKey));
 
-                const options = document.querySelectorAll('[data-form-saves] option');
+                const options = document.querySelectorAll(`[data-form-saves] option`);
                 console.assert(options.length === 3, 'There should be 3 options in the form-saves select');
                 console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
                 console.assert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'mlkkuhn@live.com'), 'The first option value should be mlkkuhn@live.com');
                 console.assert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'test@mail.com'), 'The second option value should be test@mail.com');
             }
-        }, {
+        },
+        {
             name: "It should reset and load a saved form when selected from the form-saves select",
             fn: () => {
+                let eventTriggered = false;
+                document.addEventListener(window.formLoadedKey, () => {
+                    eventTriggered = true;
+                    console.assert(getValue(`#email`) === 'x@mail.com', 'Email field should be populated with "x@mail.com"');
+                    console.assert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
+                    console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
+                    console.assert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
+                });
+                
                 setField(`#last-name`, 'Kuhn');
                 localStorage.setItem('test@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
                 document.dispatchEvent(new CustomEvent(window.refreshEventKey));
-                document.querySelector('[data-form-saves]').selectedIndex = 1;
-                document.querySelector('[data-form-saves]').dispatchEvent(new Event('input', { bubbles: true }));
-                console.assert(getValue(`#email`) === 'x@mail.com', 'Email field should be populated with "x@mail.com"');
-                console.assert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
-                console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
-                console.assert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
+                document.querySelector(`[data-form-saves]`).selectedIndex = 1;
+                document.querySelector(`[data-form-saves]`).dispatchEvent(new Event('input', { bubbles: true }));
+                setTimeout(() => {
+                    console.assert(eventTriggered, 'formLoaded event should have been triggered');
+                }, 10);
             }
-        }, {
+        },
+        {
             name: "It should not save any fields that aren't marked with data-auto-save",
             fn: () => {
                 setField(`#email`, 'test@mail.com');
