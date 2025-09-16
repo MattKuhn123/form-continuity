@@ -1,4 +1,5 @@
 window.refreshEventKey = 'form-auto-save-refresh';
+window.refreshedKey = 'form-auto-save-refreshed';
 window.isSaveEnabled = () => true;
 window.autoSaveKey = () => Math.floor(Math.random() * 10000);
 
@@ -70,6 +71,7 @@ function refreshFormSelect() {
 function refresh() {
     refreshSaveStatusNotification();
     refreshFormSelect();
+    document.dispatchEvent(new CustomEvent(window.refreshedKey));
 }
 
 function getSaveEnabledNotice() {
