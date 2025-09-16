@@ -238,7 +238,7 @@ document.addEventListener('test', () => {
                     }
 
                     setField(`#last-name`, 'Kuhn');
-                    localStorage.setItem('x@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
+                    localStorage.setItem('form-save-x@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
                     document.dispatchEvent(new CustomEvent(window.refreshEventKey));
                     setTimeout(() => {
                         console.assert(formLoaded, 'formLoaded event should have been triggered');
