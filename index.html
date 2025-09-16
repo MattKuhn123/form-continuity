@@ -225,7 +225,7 @@ document.addEventListener('test', () => {
                     document.addEventListener(window.refreshedKey, onRefreshed, { once: true });
                     function onRefreshed() {
                         document.addEventListener(window.formLoadedKey, onFormLoaded, { once: true });
-                        document.querySelector(`[data-form-saves]`).value = 'x@mail.com';
+                        document.querySelector(`[data-form-saves]`).selectedIndex = 1;
                         document.querySelector(`[data-form-saves]`).dispatchEvent(new Event('input', { bubbles: true }));
                     }
 
