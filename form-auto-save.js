@@ -25,7 +25,7 @@ function loadForm() {
         for (const [key, value] of Object.entries(formObj)) {
             const field = getForm().elements.namedItem(key);
             if (field) {
-                field[x.type === 'checkbox' ? "checked" : "value"] = value;
+                field[field.type === 'checkbox' ? "checked" : "value"] = value;
             }
         }
     }
