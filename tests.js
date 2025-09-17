@@ -84,10 +84,13 @@ document.addEventListener('test', () => {
                         console.assert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
                         console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
                         console.assert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
+                        console.assert(getValue(`#favorite-food`) === 'pizza', 'Favorite food field should be populated with "pizza"');
+                        console.assert(getValue(`#gender`) === 'male', 'Gender should be male');
+                        console.assert(document.querySelector(`#confirm`).checked === true, 'Confirm checkbox should be checked');
                     }
 
                     setField(`#last-name`, 'Kuhn');
-                    localStorage.setItem('form-save-x@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test" }));
+                    localStorage.setItem('form-save-x@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test", "favorite-food": "pizza", "gender": "male", "confirm": true }));
                     document.dispatchEvent(new CustomEvent(window.refreshEventKey));
                     setTimeout(() => {
                         console.assert(formLoaded, 'formLoaded event should have been triggered');
