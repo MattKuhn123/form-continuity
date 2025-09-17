@@ -8,7 +8,8 @@ function saveForm() {
     if (isSaveEnabled()) {
         const formObj = {};
         Array.from(getForm().elements).filter(x => x.hasAttribute('data-auto-save')).forEach(x =>
-            formObj[x.name] = x.value
+            // if is checkbox, get checked state instead of value
+            formObj[x.name] = x.type === 'checkbox' ? x.checked : x.value
         );
 
         localStorage.setItem(prefix + autoSaveKey(), JSON.stringify(formObj));
@@ -24,7 +25,7 @@ function loadForm() {
         for (const [key, value] of Object.entries(formObj)) {
             const field = getForm().elements.namedItem(key);
             if (field) {
-                field.value = value;
+                field[x.type === 'checkbox' ? "checked" : "value"] = value;
             }
         }
     }
