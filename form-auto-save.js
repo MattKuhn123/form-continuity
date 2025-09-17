@@ -86,6 +86,10 @@ function getFormSelect() {
     return document.querySelector(`select[data-form-saves]`);
 }
 
+function getDeleteFormButton() {
+    return document.querySelector(`button[data-delete-form-save]`);
+}
+
 function getForm() {
     return document.querySelector(`form[data-auto-save-form]`);
 }
@@ -93,5 +97,6 @@ function getForm() {
 getForm().addEventListener('input', saveForm);
 getForm().addEventListener('submit', deleteForm);
 getFormSelect().addEventListener('input', loadForm);
+getDeleteFormButton().addEventListener('click', deleteForm);
 document.addEventListener(refreshEventKey, refresh);
 refresh();

@@ -108,6 +108,36 @@ document.addEventListener('test', () => {
                 console.assert(save["first-name"] === "Matt", 'first-name should be saved in localStorage because it is marked with data-auto-save');
                 console.assert(save["ssn"] === undefined, 'SSN should not be saved in localStorage because it is not marked with data-auto-save');
             }
+        },
+        {
+            name: "It should delete the saved form and reset the form when the delete button is clicked",
+            fn: async () => {
+                return new Promise(resolve => {
+                    document.addEventListener(window.refreshedKey, onRefreshed_preDelete, { once: true });
+                    function onRefreshed_preDelete() {
+                        const options = document.querySelectorAll(`[data-form-saves] option`);
+                        console.assert(options.length === 3, 'There should be 3 options in the form-saves select before delete');
+                        console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
+                        console.assert(options[1].value === 'mlkkuhn@live.com, the second option value should be mlkkuhn@live.com');
+                        console.assert(options[2].value === 'test@mail.com', 'The third option value should be test@mail.com');
+                        document.addEventListener(window.refreshedKey, onRefreshed_postDelete, { once: true });
+                        document.querySelector(`[data-form-saves]`).selectedIndex = 1;
+                        document.querySelector(`button[data-delete-form-save]`).dispatchEvent(new Event('click', { bubbles: true }));
+                    }
+
+                    function onRefreshed_postDelete() {
+                        const options = document.querySelectorAll(`[data-form-saves] option`);
+                        console.assert(options.length === 2, 'There should be 2 options in the form-saves select after delete');
+                        console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
+                        console.assert(options[1].value === 'test@mail.com', 'The second option value should be test@mail.com');
+                        resolve();
+                    }
+    
+                    localStorage.setItem('form-save-mlkkuhn@live.com', JSON.stringify({ "email":"mlkkuhn@live.com", "confirm-email":"mlkkuhn@live.com" }));
+                    localStorage.setItem('form-save-test@mail.com', JSON.stringify({ "email":"test@mail.com", "confirm-email":"test@mail.com" }));
+                    document.dispatchEvent(new CustomEvent(window.refreshEventKey));
+                });
+            }
         }
     ];
     
