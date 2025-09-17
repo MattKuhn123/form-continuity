@@ -119,7 +119,7 @@ document.addEventListener('test', () => {
                         console.assert(options.length === 3, 'There should be 3 options in the form-saves select before delete');
                         console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
                         console.assert(options[1].value === 'test@mail.com', 'The second option value should be test@mail.com');
-                        console.assert(options[2].value === 'mlkkuhn@live.com, the third option value should be mlkkuhn@live.com');
+                        console.assert(options[2].value === 'mlkkuhn@live.com', 'the third option value should be mlkkuhn@live.com');
                         document.addEventListener(window.refreshedKey, onRefreshed_postDelete, { once: true });
                         document.querySelector(`[data-form-saves]`).selectedIndex = 1;
                         document.querySelector(`button[data-delete-form-save]`).dispatchEvent(new Event('click', { bubbles: true }));
