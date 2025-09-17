@@ -85,7 +85,7 @@ document.addEventListener('test', () => {
                         console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
                         console.assert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
                         console.assert(getValue(`#favorite-food`) === 'pizza', 'Favorite food field should be populated with "pizza"');
-                        console.assert(getValue(`#gender`) === 'male', 'Gender should be male');
+                        console.assert(document.querySelector(`[name=gender]:checked`).value === 'male', 'Gender should be male');
                         console.assert(document.querySelector(`#confirm`).checked === true, 'Confirm checkbox should be checked');
                     }
 
