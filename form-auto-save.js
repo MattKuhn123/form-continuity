@@ -4,19 +4,29 @@ window.isSaveEnabled = () => true;
 window.autoSaveKey = () => Math.floor(Math.random() * 10000);
 
 const prefix = 'form-save-';
+// Update saveForm to handle radio inputs
 function saveForm() {
     if (isSaveEnabled()) {
         const formObj = {};
-        Array.from(getForm().elements).filter(x => x.hasAttribute('data-auto-save')).forEach(x =>
-            // if is checkbox, get checked state instead of value
-            formObj[x.name] = x.type === 'checkbox' ? x.checked : x.value
-        );
+        const elements = Array.from(getForm().elements).filter(x => x.hasAttribute('data-auto-save'));
+        elements.forEach(x => {
+            if (x.type === 'checkbox') {
+                formObj[x.name] = x.checked;
+            } else if (x.type === 'radio') {
+                if (x.checked) {
+                    formObj[x.name] = x.value;
+                }
+            } else {
+                formObj[x.name] = x.value;
+            }
+        });
 
         localStorage.setItem(prefix + autoSaveKey(), JSON.stringify(formObj));
         refresh();
     }
 }
 
+// Update loadForm to handle radio inputs
 function loadForm() {
     getForm().reset();
     const formSave = localStorage.getItem(prefix + getFormSelect().value);
@@ -24,8 +34,24 @@ function loadForm() {
         const formObj = JSON.parse(formSave);
         for (const [key, value] of Object.entries(formObj)) {
             const field = getForm().elements.namedItem(key);
-            if (field) {
-                field[field.type === 'checkbox' ? "checked" : "value"] = value;
+            if (!field) {
+                continue;
+            }
+
+            if (field.type === 'checkbox') {
+                field.checked = value;
+            } else if (field.type === 'radio') {
+                // For radio, set checked on the matching value
+                const radios = getForm().elements[key];
+                if (radios && radios.length) {
+                    Array.from(radios).forEach(radio => {
+                        radio.checked = radio.value === value;
+                    });
+                } else {
+                    field.checked = field.value === value;
+                }
+            } else {
+                field.value = value;
             }
         }
     }
@@ -33,6 +59,7 @@ function loadForm() {
     refresh();
     document.dispatchEvent(new CustomEvent(window.formLoadedKey));
 }
+
 
 function deleteForm() {
     localStorage.removeItem(prefix + autoSaveKey());
