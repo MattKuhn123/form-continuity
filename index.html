@@ -52,10 +52,10 @@
 </head>
 
 <body>
-<section id="form-saves-section">
-    <label for="form-saves">Contacts in progress...</label>
-    <button data-delete-form-save class="full-width">Delete selected contact in progress</button>
-    <select data-form-saves id="form-saves" class="full-width"></select>
+<section id="form-saves-section" style="display: flex; justify-content: space-around; gap: 10px">
+    <label for="form-saves" style="flex: 1">Contacts in progress...</label>
+    <select data-form-saves id="form-saves" style="flex: 2"></select>
+    <button data-delete-form-save style="flex: 1">Delete</button>
 </section>
 <form onsubmit="return onFormSubmit()" data-auto-save-form>
     <h1>Contact</h1>
