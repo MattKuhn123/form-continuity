@@ -5,51 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>form-continuity-demo</title>
-    <link rel="icon" type="image/png" href="favicon.ico">
-    <style>
-        body {
-            font: 400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-            color: #111;
-            background-color: #fdfdfd;
-            min-height: 100vh;
-            flex-direction: column;
-            max-width: -webkit-calc(800px - (30px * 2));
-            max-width: calc(800px - (30px * 2));
-            margin-right: auto;
-            margin-left: auto;
-            padding-right: 30px;
-            padding-left: 30px;
-        }
-
-        button, input, select, textarea {
-            padding: 5px;
-            margin-bottom: 5px;
-        }
-
-        button {
-            background-color: darkseagreen;
-        }
-
-        input:not([type="radio"]):not([type="checkbox"]), select {
-            display: block;
-        }
-
-
-        output {
-            font-family: monospace;
-            font-style: italic;
-            font-size: small;
-        }
-
-        .full-width {
-            width: 100%;
-        }
-
-        aside {
-            font-size: small;
-            font-style: italic;
-        }
-    </style>
+    <link rel="icon" type="image/png" href="favicon.ico"/>
+    <link rel="stylesheet" href="styles.css"/>
 </head>
 
 <body>
@@ -135,7 +92,7 @@
 <button onclick="document.dispatchEvent(new CustomEvent('test'))" class="full-width">Run Tests</button>
 
 <script src="form-auto-save.js"></script>
-<script src="index-app.js"></script>
+<script src="app.js"></script>
 <script src="tests.js"></script>
 </body>
 

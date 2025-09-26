@@ -4,7 +4,6 @@ window.isSaveEnabled = () => true;
 window.autoSaveKey = () => Math.floor(Math.random() * 10000);
 
 const prefix = 'form-save-';
-// Update saveForm to handle radio inputs
 function saveForm() {
     if (isSaveEnabled()) {
         const formObj = {};
@@ -26,7 +25,6 @@ function saveForm() {
     }
 }
 
-// Update loadForm to handle radio inputs
 function loadForm() {
     getForm().reset();
     const formSave = localStorage.getItem(prefix + getFormSelect().value);
@@ -41,7 +39,6 @@ function loadForm() {
             if (field.type === 'checkbox') {
                 field.checked = value;
             } else if (field.type === 'radio') {
-                // For radio, set checked on the matching value
                 const radios = getForm().elements[key];
                 if (radios && radios.length) {
                     Array.from(radios).forEach(radio => {
