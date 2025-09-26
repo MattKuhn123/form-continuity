@@ -1,4 +1,4 @@
-document.addEventListener('test', async () => {
+window.test = async function () {
     console.info('Tests starting');
     
     function beforeEach(test) {
@@ -32,14 +32,24 @@ document.addEventListener('test', async () => {
         return isVisible(q) === false;
     }
 
+    function consoleAssert(condition, description) {
+        console.assert(condition, description);
+        if (condition) {
+            window.testResults += `✅ ${description}\n`;
+        } else {
+            window.testResults += `❌ ${description}\n`;
+            window.failedTests++;
+        }
+    }
+
     const tests = [
         {
             name: "It should show the save-disabled notice if the emails are different",
             fn: async () => {
                 setField(`#email`, 'test@mail.com');
                 setField(`#confirm-email`, 'x-test@mail.com-x');
-                console.assert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
-                console.assert(isNotVisible('[data-save-enabled-notice]'), 'Save enabled notice should not be visible');
+                consoleAssert(isVisible('[data-save-disabled-notice]'), 'Save disabled notice should be visible');
+                consoleAssert(isNotVisible('[data-save-enabled-notice]'), 'Save enabled notice should not be visible');
             }
         },
         {
@@ -47,8 +57,8 @@ document.addEventListener('test', async () => {
             fn: async () => {
                 setField(`#email`, 'test@mail.com');
                 setField(`#confirm-email`, 'test@mail.com');
-                console.assert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
-                console.assert(isNotVisible('[data-save-disabled-notice]'), 'Save disabled notice should not be visible');
+                consoleAssert(isVisible('[data-save-enabled-notice]'), 'Save enabled notice should be visible');
+                consoleAssert(isNotVisible('[data-save-disabled-notice]'), 'Save disabled notice should not be visible');
             }
         },
         {
@@ -60,10 +70,10 @@ document.addEventListener('test', async () => {
                 document.dispatchEvent(new CustomEvent(window.refreshEventKey));
 
                 const options = document.querySelectorAll(`[data-form-saves] option`);
-                console.assert(options.length === 3, 'There should be 3 options in the form-saves select');
-                console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
-                console.assert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'mlkkuhn@live.com'), 'The first option value should be mlkkuhn@live.com');
-                console.assert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'test@mail.com'), 'The second option value should be test@mail.com');
+                consoleAssert(options.length === 3, 'There should be 3 options in the form-saves select');
+                consoleAssert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
+                consoleAssert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'mlkkuhn@live.com'), 'The first option value should be mlkkuhn@live.com');
+                consoleAssert(Array.from(options.entries()).map(x => x[1].value).some(x => x === 'test@mail.com'), 'The second option value should be test@mail.com');
             }
         },
         {
@@ -80,20 +90,20 @@ document.addEventListener('test', async () => {
 
                     function onFormLoaded () {
                         formLoaded = true;
-                        console.assert(getValue(`#email`) === 'x@mail.com', 'Email field should be populated with "x@mail.com"');
-                        console.assert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
-                        console.assert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
-                        console.assert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
-                        console.assert(getValue(`#favorite-food`) === 'pizza', 'Favorite food field should be populated with "pizza"');
-                        console.assert(document.querySelector(`[name=gender]:checked`).value === 'male', 'Gender should be male');
-                        console.assert(document.querySelector(`#confirm`).checked === true, 'Confirm checkbox should be checked');
+                        consoleAssert(getValue(`#email`) === 'x@mail.com', 'Email field should be populated with "x@mail.com"');
+                        consoleAssert(getValue(`#confirm-email`) === 'x@mail.com', 'Confirm email field should be populated with "x@mail.com"');
+                        consoleAssert(getValue(`#first-name`) === 'test', 'First name field should be populated with "test"');
+                        consoleAssert(getValue(`#last-name`) === '', 'Last name field should be reset because it was not in the saved data');
+                        consoleAssert(getValue(`#favorite-food`) === 'pizza', 'Favorite food field should be populated with "pizza"');
+                        consoleAssert(document.querySelector(`[name=gender]:checked`).value === 'male', 'Gender should be male');
+                        consoleAssert(document.querySelector(`#confirm`).checked === true, 'Confirm checkbox should be checked');
                     }
 
                     setField(`#last-name`, 'Kuhn');
                     localStorage.setItem('form-save-x@mail.com', JSON.stringify({ "email":"x@mail.com", "confirm-email":"x@mail.com", "first-name":"test", "favorite-food": "pizza", "gender": "male", "confirm": true }));
                     document.dispatchEvent(new CustomEvent(window.refreshEventKey));
                     setTimeout(() => {
-                        console.assert(formLoaded, 'formLoaded event should have been triggered');
+                        consoleAssert(formLoaded, 'formLoaded event should have been triggered');
                         resolve();
                     }, 100);
                 });
@@ -108,8 +118,8 @@ document.addEventListener('test', async () => {
                 setField(`#ssn`, '123-45-6789');
 
                 const save = JSON.parse(localStorage.getItem('form-save-test@mail.com'));
-                console.assert(save["first-name"] === "Matt", 'first-name should be saved in localStorage because it is marked with data-auto-save');
-                console.assert(save["ssn"] === undefined, 'SSN should not be saved in localStorage because it is not marked with data-auto-save');
+                consoleAssert(save["first-name"] === "Matt", 'first-name should be saved in localStorage because it is marked with data-auto-save');
+                consoleAssert(save["ssn"] === undefined, 'SSN should not be saved in localStorage because it is not marked with data-auto-save');
             }
         },
         {
@@ -119,10 +129,10 @@ document.addEventListener('test', async () => {
                     document.addEventListener(window.refreshedKey, onRefreshed_preDelete, { once: true });
                     function onRefreshed_preDelete() {
                         const options = document.querySelectorAll(`[data-form-saves] option`);
-                        console.assert(options.length === 3, 'There should be 3 options in the form-saves select before delete');
-                        console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
-                        console.assert(options[1].value === 'test@mail.com', 'The second option value should be test@mail.com');
-                        console.assert(options[2].value === 'mlkkuhn@live.com', 'the third option value should be mlkkuhn@live.com');
+                        consoleAssert(options.length === 3, 'There should be 3 options in the form-saves select before delete');
+                        consoleAssert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
+                        consoleAssert(options[1].value === 'test@mail.com', 'The second option value should be test@mail.com');
+                        consoleAssert(options[2].value === 'mlkkuhn@live.com', 'the third option value should be mlkkuhn@live.com');
                         document.addEventListener(window.formLoadedKey, onFormLoaded, { once: true });
                         document.querySelector(`[data-form-saves]`).selectedIndex = 1;
                         document.querySelector(`[data-form-saves]`).dispatchEvent(new Event('input', { bubbles: true }));
@@ -135,9 +145,9 @@ document.addEventListener('test', async () => {
 
                     function onRefreshed_postDelete() {
                         const options = document.querySelectorAll(`[data-form-saves] option`);
-                        console.assert(options.length === 2, 'There should be 2 options in the form-saves select after delete');
-                        console.assert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
-                        console.assert(options[1].value === 'mlkkuhn@live.com', 'The second option value should be mlkkuhn@live.com');
+                        consoleAssert(options.length === 2, 'There should be 2 options in the form-saves select after delete');
+                        consoleAssert(options[0].value === '-- Select an option --', 'The first option value should be -- Select an option --');
+                        consoleAssert(options[1].value === 'mlkkuhn@live.com', 'The second option value should be mlkkuhn@live.com');
                         resolve();
                     }
     
@@ -154,4 +164,16 @@ document.addEventListener('test', async () => {
         await test.fn();
         afterEach(test.name);
     }
-});
+}
+
+window.testResults = "";
+window.failedTests = 0;
+await window.test();
+
+// download results
+const blob = new Blob([`Test Results\n============\n\n${window.testResults}\nFailed tests: ${window.failedTests}`], { type: 'text/plain' });
+const a = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = "test-results.txt"; 
+link.click();
+URL.revokeObjectURL(link.href);
