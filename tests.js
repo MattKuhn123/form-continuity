@@ -1,4 +1,4 @@
-document.addEventListener('test', () => {
+document.addEventListener('test', async () => {
     console.info('Tests starting');
     
     function beforeEach(test) {
@@ -149,9 +149,9 @@ document.addEventListener('test', () => {
         }
     ];
     
-    tests.forEach(async (test) => {
+    for (const test of tests) {
         beforeEach(test.name);
         await test.fn();
         afterEach(test.name);
-    });
+    }
 });
