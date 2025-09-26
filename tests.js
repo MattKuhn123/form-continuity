@@ -166,14 +166,16 @@ window.test = async function () {
     }
 }
 
-window.testResults = "";
-window.failedTests = 0;
-await window.test();
+window.executeTests = async () => {
+    window.testResults = "";
+    window.failedTests = 0;
+    await window.test();
+    const blob = new Blob([`Test Results\n============\n\n${window.testResults}\nFailed tests: ${window.failedTests}`], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "test-results.txt"; 
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
 
-// download results
-const blob = new Blob([`Test Results\n============\n\n${window.testResults}\nFailed tests: ${window.failedTests}`], { type: 'text/plain' });
-const a = document.createElement('a');
-link.href = URL.createObjectURL(blob);
-link.download = "test-results.txt"; 
-link.click();
-URL.revokeObjectURL(link.href);
+window.executeTests();
